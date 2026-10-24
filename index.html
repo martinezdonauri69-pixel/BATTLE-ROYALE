@@ -1,1 +1,52 @@
 
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Zona Final · Lobby</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head><body>
+<canvas id="scene"></canvas>
+<div id="ui">
+  <header id="profile" class="pn">
+    <button class="av" id="av" data-open="character" aria-label="Personaje"></button>
+    <div class="pi"><b id="pname"></b><span id="plvl"></span><div class="bar"><i id="xpbar"></i></div></div>
+    <button class="rk" data-open="rank" aria-label="Rango">🛡️</button>
+  </header>
+  <nav id="res">
+    <div class="chip pn">🪙<b id="coins"></b><button data-open="shop" aria-label="Comprar monedas">+</button></div>
+    <div class="chip pn">💎<b id="gems"></b><button data-open="shop" aria-label="Comprar diamantes">+</button></div>
+    <button class="ic pn" data-open="friends" aria-label="Amigos">👥</button>
+    <button class="ic pn" data-open="mail" aria-label="Mensajes">✉️</button>
+    <button class="ic pn" data-open="settings" aria-label="Ajustes">⚙️</button>
+  </nav>
+  <nav id="side">
+    <button class="sb pass pn" data-open="pass"><span>🎖️</span>Pase de batalla</button>
+    <button class="sb pn" data-open="shop"><span>🛒</span>Tienda</button>
+    <button class="sb pn" data-open="events"><span>📅</span>Eventos</button>
+    <button class="sb pn" data-open="missions"><span>✅</span>Misiones</button>
+    <button class="sb pn" data-open="clan"><span>🛡️</span>Clan</button>
+  </nav>
+  <button id="invite" class="pn" data-a="invite"><b>+</b>Invitar amigo</button>
+  <section id="right">
+    <div id="maps"></div>
+    <div class="tabs pn" id="modes"></div>
+    <div class="tabs pn" id="cams"><button data-cam="FPP">FPP</button><button data-cam="TPP">TPP</button></div>
+    <button id="play">INICIAR</button>
+  </section>
+  <nav id="bottom">
+    <button data-open="weapons"><span>🔫</span>Armas</button>
+    <button data-open="character"><span>🪖</span>Personaje</button>
+    <button data-open="inventory"><span>🎒</span>Inventario</button>
+    <button data-open="rank"><span>🏅</span>Rango</button>
+    <button data-open="settings"><span>⚙️</span>Ajustes</button>
+  </nav>
+  <div id="tip" class="pn">Gira el celular para ver mejor el lobby</div>
+</div>
+<div id="panel" hidden><div class="card pn"><header><h2 id="ptitle"></h2><button id="pclose" aria-label="Cerrar">✕</button></header><div id="pbody"></div></div></div>
+<div id="loading" hidden><div class="ld"><h2 id="ltitle"></h2><div class="bar big"><i id="lbar"></i></div><p id="lmsg"></p><p id="lnote" hidden>Simulación local terminada. Todavía no existe un servidor multijugador, así que no se ha conectado ningún jugador real. En la Parte 2 aquí se cargará el mapa jugable.</p><button id="lcancel" class="b">Cancelar</button></div></div>
+<div id="toast"></div>
+<script type="module" src="js/ui.js"></script>
+</body></html>
