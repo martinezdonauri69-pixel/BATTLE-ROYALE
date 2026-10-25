@@ -1,51 +1,152 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8">
+<html lang="es">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Zona Final · Lobby</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Zona Final</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
-</head><body>
-<canvas id="scene"></canvas>
-<div id="ui">
-  <header id="profile" class="pn">
-    <button class="av" id="av" data-open="character" aria-label="Personaje"></button>
-    <div class="pi"><b id="pname"></b><span id="plvl"></span><div class="bar"><i id="xpbar"></i></div></div>
-    <button class="rk" data-open="rank" aria-label="Rango">🛡️</button>
-  </header>
-  <nav id="res">
-    <div class="chip pn">🪙<b id="coins"></b><button data-open="shop" aria-label="Comprar monedas">+</button></div>
-    <div class="chip pn">💎<b id="gems"></b><button data-open="shop" aria-label="Comprar diamantes">+</button></div>
-    <button class="ic pn" data-open="friends" aria-label="Amigos">👥</button>
-    <button class="ic pn" data-open="mail" aria-label="Mensajes">✉️</button>
-    <button class="ic pn" data-open="settings" aria-label="Ajustes">⚙️</button>
-  </nav>
-  <nav id="side">
-    <button class="sb pass pn" data-open="pass"><span>🎖️</span>Pase de batalla</button>
-    <button class="sb pn" data-open="shop"><span>🛒</span>Tienda</button>
-    <button class="sb pn" data-open="events"><span>📅</span>Eventos</button>
-    <button class="sb pn" data-open="missions"><span>✅</span>Misiones</button>
-    <button class="sb pn" data-open="clan"><span>🛡️</span>Clan</button>
-  </nav>
-  <button id="invite" class="pn" data-a="invite"><b>+</b>Invitar amigo</button>
-  <section id="right">
-    <div id="maps"></div>
-    <div class="tabs pn" id="modes"></div>
-    <div class="tabs pn" id="cams"><button data-cam="FPP">FPP</button><button data-cam="TPP">TPP</button></div>
-    <button id="play">INICIAR</button>
-  </section>
-  <nav id="bottom">
-    <button data-open="weapons"><span>🔫</span>Armas</button>
-    <button data-open="character"><span>🪖</span>Personaje</button>
-    <button data-open="inventory"><span>🎒</span>Inventario</button>
-    <button data-open="rank"><span>🏅</span>Rango</button>
-    <button data-open="settings"><span>⚙️</span>Ajustes</button>
-  </nav>
-  <div id="tip" class="pn">Gira el celular para ver mejor el lobby</div>
+<script type="importmap">
+{"imports":{
+"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;color:#fff;background:#05080f;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:600}
+[hidden]{display:none!important}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+#app{position:fixed;inset:0;overflow:hidden;background:#0b0f1a url(assets/fondo.png) center/cover no-repeat}
+@media (orientation:portrait){
+ #app{inset:auto;top:0;left:100vw;width:100vh;height:100vw;transform-origin:0 0;transform:rotate(90deg)}
+}
+#scene{position:absolute;inset:0;z-index:0}
+#scene canvas{display:block;width:100%;height:100%;touch-action:none}
+.ui{position:absolute;inset:0;z-index:1;pointer-events:none}
+.ui>*{pointer-events:auto}
+.grow{flex:1}
+#top{position:absolute;left:8px;right:8px;top:6px;display:flex;align-items:center;gap:6px;pointer-events:none}
+#top>*{pointer-events:auto}
+#profile{display:flex;gap:8px;align-items:center;background:linear-gradient(90deg,rgba(8,12,22,.85),rgba(8,12,22,.4));padding:4px 14px 4px 4px;border-bottom:2px solid #ffd23a;min-width:150px;cursor:pointer}
+#av{width:40px;height:40px;display:grid;place-items:center;font-size:18px;font-weight:700;background:linear-gradient(135deg,#2f8bff,#123b8c)}
+.pinfo{display:flex;flex-direction:column;line-height:1.05}
+.pinfo b{font-size:17px}.pinfo small{opacity:.8;font-size:13px}
+.xp{height:4px;width:110px;background:rgba(255,255,255,.2);margin-top:3px}
+.xp i{display:block;height:100%;width:0;background:#ffd23a}
+.cur{display:flex;align-items:center;gap:6px;background:rgba(8,12,22,.7);padding:2px 2px 2px 8px;border-radius:4px}
+.cur b{font-size:17px;min-width:42px}
+.plus{width:30px;height:30px;background:#ffd23a;color:#111;font-size:20px;font-weight:700}
+.ico{width:36px;height:36px;background:rgba(8,12,22,.7);border-radius:4px;font-size:18px}
+#menu{position:absolute;left:8px;top:58px;width:170px;display:flex;flex-direction:column;gap:5px}
+#menu button{background:rgba(8,12,22,.72);padding:9px 10px;text-align:left;font-size:17px;letter-spacing:.5px;border-left:3px solid transparent}
+#menu button:active{border-left-color:#ffd23a;background:rgba(20,28,48,.9)}
+#menu .pass{background:linear-gradient(90deg,rgba(40,60,110,.9),rgba(8,12,22,.6));padding:12px 10px}
+#menu .pass span{display:block;font-size:19px;font-weight:700}
+#menu .pass small{opacity:.8}
+#menu .inv{text-align:center;opacity:.9}
+#side{position:absolute;right:8px;bottom:52px;width:280px;max-width:42%;display:flex;flex-direction:column;gap:6px}
+#maps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:6px;scrollbar-width:none}
+#maps::-webkit-scrollbar{display:none}
+.map{flex:0 0 100%;scroll-snap-align:start;min-height:62px;padding:6px 10px;text-align:left;border:2px solid transparent;background:linear-gradient(135deg,var(--a),var(--b));position:relative}
+.map::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 70%)}
+.map span{position:relative;z-index:1;display:block}
+.map .mt{font-size:19px;font-weight:700}
+.map .md{font-size:12px;opacity:.9;line-height:1.1}
+.map.sel{border-color:#ffd23a}
+.seg{display:flex;background:rgba(8,12,22,.75)}
+.seg button{flex:1;background:none;padding:8px 4px;font-size:16px;border-bottom:3px solid transparent;opacity:.8}
+.seg button.sel{color:#ffd23a;opacity:1;border-bottom-color:#ffd23a;background:rgba(255,210,58,.12)}
+#play{background:linear-gradient(180deg,#ffe25a,#f5b800);color:#111;font-size:28px;font-weight:700;padding:8px;letter-spacing:1px}
+#play:active{transform:scale(.98)}
+#dock{position:absolute;left:0;right:0;bottom:0;height:46px;display:flex;background:rgba(6,9,16,.88)}
+#dock button{flex:1;background:none;font-size:15px;letter-spacing:.5px;border-right:1px solid rgba(255,255,255,.08)}
+#dock button:active{background:rgba(255,210,58,.15)}
+#panel{position:absolute;inset:0;z-index:5;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:10px}
+.pcard{width:min(560px,96%);max-height:100%;overflow:auto;background:#111827;border:1px solid rgba(255,255,255,.12);border-top:3px solid #ffd23a;padding:10px 14px 14px}
+.phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.phead h2{font-size:24px}
+#pclose{background:#1f2937;width:34px;height:34px;font-size:16px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.row b{display:block;font-size:17px}.row small{display:block;opacity:.7;font-size:13px}
+.row em{font-style:normal;opacity:.65;font-size:14px;white-space:nowrap}
+.b{background:#2b3550;padding:8px 12px;font-size:15px;border-radius:3px;white-space:nowrap}
+.b.y{background:#ffd23a;color:#111}
+.b.off{background:#1a2030;opacity:.85}
+.bar{height:6px;background:rgba(255,255,255,.15);margin-top:5px;width:100%}
+.bar i{display:block;height:100%;background:#ffd23a}
+input[type=text]{background:#0b1020;border:1px solid #334;color:#fff;padding:7px;font:inherit;width:140px}
+input[type=range]{width:150px}
+#loading{position:absolute;inset:0;z-index:9;background:rgba(5,8,15,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px}
+.ltrack{width:min(60%,420px);height:8px;background:#222}
+#lbar{display:block;height:100%;width:0;background:#ffd23a;transition:width .5s}
+#lcancel{background:#2b3550;padding:9px 18px;font-size:17px;margin-top:6px}
+#lnote{opacity:.8;max-width:420px}
+#toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(8,12,22,.95);border:1px solid #ffd23a;padding:8px 16px;z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="scene"></div>
+
+ <div class="ui">
+  <div id="top">
+   <div id="profile" data-open="rank">
+    <div id="av">DO</div>
+    <div class="pinfo"><b id="pname">Jugador</b><small id="plvl">Nv. 1</small><div class="xp"><i id="xpbar"></i></div></div>
+   </div>
+   <div class="grow"></div>
+   <div class="cur"><span>🪙</span><b id="coins">0</b><button class="plus" data-open="shop">+</button></div>
+   <div class="cur"><span>💎</span><b id="gems">0</b><button class="plus" data-open="shop">+</button></div>
+   <button class="ico" data-open="friends">👥</button>
+   <button class="ico" data-open="mail">✉️</button>
+   <button class="ico" data-open="settings">⚙️</button>
+  </div>
+
+  <div id="menu">
+   <button class="pass" data-open="pass"><span>PASE DE BATALLA</span><small>Recompensas</small></button>
+   <button data-open="shop">🛒 TIENDA</button>
+   <button data-open="events">📅 EVENTOS</button>
+   <button data-open="missions">✅ MISIONES</button>
+   <button data-open="clan">🛡️ CLAN</button>
+   <button id="invite" class="inv">＋ Invitar amigo</button>
+  </div>
+
+  <div id="side">
+   <div id="maps"></div>
+   <div id="modes" class="seg"></div>
+   <div class="seg">
+    <button data-cam="FPP">FPP</button>
+    <button data-cam="TPP">TPP</button>
+   </div>
+   <button id="play">INICIAR</button>
+  </div>
+
+  <div id="dock">
+   <button data-open="weapons">🔫 ARMAS</button>
+   <button data-open="character">🪖 PERSONAJE</button>
+   <button data-open="inventory">🎒 INVENTARIO</button>
+   <button data-open="rank">🎖️ RANGO</button>
+   <button data-open="settings">⚙️ AJUSTES</button>
+  </div>
+ </div>
+
+ <div id="panel" hidden>
+  <div class="pcard">
+   <div class="phead"><h2 id="ptitle"></h2><button id="pclose">✕</button></div>
+   <div id="pbody"></div>
+  </div>
+ </div>
+
+ <div id="loading" hidden>
+  <h2 id="ltitle"></h2>
+  <div class="ltrack"><i id="lbar"></i></div>
+  <p id="lmsg"></p>
+  <p id="lnote" hidden>La partida real llegará en las siguientes partes del juego.</p>
+  <button id="lcancel">Cancelar</button>
+ </div>
+
+ <div id="toast"></div>
 </div>
-<div id="panel" hidden><div class="card pn"><header><h2 id="ptitle"></h2><button id="pclose" aria-label="Cerrar">✕</button></header><div id="pbody"></div></div></div>
-<div id="loading" hidden><div class="ld"><h2 id="ltitle"></h2><div class="bar big"><i id="lbar"></i></div><p id="lmsg"></p><p id="lnote" hidden>Simulación local terminada. Todavía no existe un servidor multijugador, así que no se ha conectado ningún jugador real. En la Parte 2 aquí se cargará el mapa jugable.</p><button id="lcancel" class="b">Cancelar</button></div></div>
-<div id="toast"></div>
 <script type="module" src="js/ui.js"></script>
-</body></html>
+</body>
+</html>
