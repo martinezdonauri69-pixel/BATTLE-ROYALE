@@ -59,21 +59,35 @@ export function setSkin(color) {
   });
 }
 
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const limit = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('tardó demasiado')), ms))]);
+
+// textura mínima de relleno si alguna no se puede reducir
+function tiny(name) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 4;
+  const x = c.getContext('2d');
+  x.fillStyle = /normal/i.test(name) ? 'rgb(128,128,255)' : /metallic/i.test(name) ? 'rgb(0,170,0)' : 'rgb(90,90,90)';
+  x.fillRect(0, 0, 4, 4);
+  return c.toDataURL('image/png');
+}
+
 // Descarga cada textura, la reduce y la entrega ya liviana al cargador
 async function shrinkTextures(mgr) {
+  const map = {};
   try {
     const base = MODEL_URL.slice(0, MODEL_URL.lastIndexOf('/') + 1);
     const json = await (await fetch(MODEL_URL)).json();
     const imgs = json.images || [];
-    const map = {};
     for (let i = 0; i < imgs.length; i++) {
       const uri = imgs[i].uri;
       if (!uri || uri.startsWith('data:')) continue;
       const name = decodeURIComponent(uri.split('/').pop());
-      say('Optimizando texturas ' + (i + 1) + ' de ' + imgs.length);
+      say('Optimizando ' + (i + 1) + ' de ' + imgs.length + ': ' + name);
+      await wait(40);
       try {
-        const blob = await (await fetch(base + uri)).blob();
-        const full = await createImageBitmap(blob);
+        const blob = await limit(fetch(base + uri).then(r => r.blob()), 20000);
+        const full = await limit(createImageBitmap(blob), 20000);
         const max = /baseColor/i.test(name) ? 1024 : 512;
         const k = Math.min(1, max / Math.max(full.width, full.height));
         const cvs = document.createElement('canvas');
@@ -81,17 +95,20 @@ async function shrinkTextures(mgr) {
         cvs.height = Math.max(1, Math.round(full.height * k));
         cvs.getContext('2d').drawImage(full, 0, 0, cvs.width, cvs.height);
         full.close();
-        const small = await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.9));
+        const small = await limit(new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.9)), 20000);
         cvs.width = cvs.height = 0;
-        if (small) map[name] = URL.createObjectURL(small);
+        map[name] = small ? URL.createObjectURL(small) : tiny(name);
       } catch (e) {
         console.error('Textura no reducida', name, e);
+        map[name] = tiny(name);
       }
     }
-    mgr.setURLModifier(url => map[decodeURIComponent(url.split('/').pop())] || url);
   } catch (e) {
     console.error('No se pudieron reducir las texturas', e);
   }
+  mgr.setURLModifier(url => map[decodeURIComponent(url.split('/').pop())] || url);
+  say('Armando el soldado…');
+  await wait(60);
 }
 
 function placeModel(gltf) {
