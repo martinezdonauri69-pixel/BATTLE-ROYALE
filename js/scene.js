@@ -13,7 +13,7 @@ const CAMS = {
 const PR = {alta: 2, media: 1.5, baja: 1};
 
 let renderer, scene, camera, holder, model, box, pendingSkin = null,
-    camMode = 'FPP', rotY = 0, drag = false, lastX = 0, quality = 'alta';
+    camMode = 'FPP', rotY = 0, drag = false, last = 0, quality = 'alta';
 
 function resize() {
   if (!renderer) return;
@@ -75,11 +75,11 @@ export function initScene(el, skinColor, cam, q) {
   holder = new THREE.Group();
   scene.add(holder);
 
-  // sombra suave bajo los pies
   const cv = document.createElement('canvas'); cv.width = cv.height = 128;
-  const g = cv.getContext('2d').createRadialGradient(64, 64, 4, 64, 64, 62);
+  const cx = cv.getContext('2d');
+  const g = cx.createRadialGradient(64, 64, 4, 64, 64, 62);
   g.addColorStop(0, 'rgba(0,0,0,.55)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-  const x = cv.getContext('2d'); x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  cx.fillStyle = g; cx.fillRect(0, 0, 128, 128);
   const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.6),
     new THREE.MeshBasicMaterial({map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false}));
   shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.01;
@@ -92,11 +92,9 @@ export function initScene(el, skinColor, cam, q) {
         (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { m.envMapIntensity = 0.55; });
       }
     });
-    // escalar a ~1.8 m y poner los pies en y=0, centrado
     const b = new THREE.Box3().setFromObject(model);
     const size = b.getSize(new THREE.Vector3());
-    const s = 1.8 / (size.y || 1);
-    model.scale.multiplyScalar(s);
+    model.scale.multiplyScalar(1.8 / (size.y || 1));
     const b2 = new THREE.Box3().setFromObject(model);
     const c = b2.getCenter(new THREE.Vector3());
     model.position.x -= c.x; model.position.z -= c.z; model.position.y -= b2.min.y;
@@ -108,10 +106,11 @@ export function initScene(el, skinColor, cam, q) {
       '<p style="position:absolute;top:45%;width:100%;text-align:center;color:#fff">No se pudo cargar el soldado (revisa assets/scene.gltf)</p>');
   });
 
-  // girar arrastrando
+  // girar arrastrando (si el celular está vertical, el lobby está girado: se usa Y)
+  const pos = e => matchMedia('(orientation:portrait)').matches ? e.clientY : e.clientX;
   const cvs = renderer.domElement;
-  cvs.addEventListener('pointerdown', e => { drag = true; lastX = e.clientX; cvs.setPointerCapture(e.pointerId); });
-  cvs.addEventListener('pointermove', e => { if (drag) { rotY += (e.clientX - lastX) * 0.01; lastX = e.clientX; } });
+  cvs.addEventListener('pointerdown', e => { drag = true; last = pos(e); cvs.setPointerCapture(e.pointerId); });
+  cvs.addEventListener('pointermove', e => { if (drag) { rotY += (pos(e) - last) * 0.01; last = pos(e); } });
   const up = () => { drag = false; };
   cvs.addEventListener('pointerup', up); cvs.addEventListener('pointercancel', up);
 
@@ -124,7 +123,7 @@ export function initScene(el, skinColor, cam, q) {
   (function loop() {
     requestAnimationFrame(loop);
     const t = clock.getElapsedTime();
-    if (!drag) rotY *= 0.96; // vuelve poco a poco al frente
+    if (!drag) rotY *= 0.96;
     holder.rotation.y = FACE + rotY + Math.sin(t * 0.6) * 0.08;
     renderer.render(scene, camera);
   })();
