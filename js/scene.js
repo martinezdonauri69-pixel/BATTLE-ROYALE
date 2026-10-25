@@ -59,6 +59,41 @@ export function setSkin(color) {
   });
 }
 
+// Descarga cada textura, la reduce y la entrega ya liviana al cargador
+async function shrinkTextures(mgr) {
+  try {
+    const base = MODEL_URL.slice(0, MODEL_URL.lastIndexOf('/') + 1);
+    const json = await (await fetch(MODEL_URL)).json();
+    const imgs = json.images || [];
+    const map = {};
+    for (let i = 0; i < imgs.length; i++) {
+      const uri = imgs[i].uri;
+      if (!uri || uri.startsWith('data:')) continue;
+      const name = decodeURIComponent(uri.split('/').pop());
+      say('Optimizando texturas ' + (i + 1) + ' de ' + imgs.length);
+      try {
+        const blob = await (await fetch(base + uri)).blob();
+        const full = await createImageBitmap(blob);
+        const max = /baseColor/i.test(name) ? 1024 : 512;
+        const k = Math.min(1, max / Math.max(full.width, full.height));
+        const cvs = document.createElement('canvas');
+        cvs.width = Math.max(1, Math.round(full.width * k));
+        cvs.height = Math.max(1, Math.round(full.height * k));
+        cvs.getContext('2d').drawImage(full, 0, 0, cvs.width, cvs.height);
+        full.close();
+        const small = await new Promise(r => cvs.toBlob(r, 'image/jpeg', 0.9));
+        cvs.width = cvs.height = 0;
+        if (small) map[name] = URL.createObjectURL(small);
+      } catch (e) {
+        console.error('Textura no reducida', name, e);
+      }
+    }
+    mgr.setURLModifier(url => map[decodeURIComponent(url.split('/').pop())] || url);
+  } catch (e) {
+    console.error('No se pudieron reducir las texturas', e);
+  }
+}
+
 function placeModel(gltf) {
   try {
     model = gltf.scene;
@@ -138,20 +173,23 @@ export function initScene(el, skinColor, cam, q) {
   shadow.position.y = 0.01;
   scene.add(shadow);
 
-  // cargador con mensajes que dicen qué archivo se está bajando
+  // cargador: primero achica las texturas (si no, el celular se queda sin memoria)
   const mgr = new THREE.LoadingManager();
   mgr.onProgress = (url, n, t) => say('Cargando ' + n + ' de ' + t + ': ' + url.split('/').pop());
   mgr.onError = url => say('FALTA O FALLÓ: ' + url.split('/').pop());
 
-  new GLTFLoader(mgr).load(
-    MODEL_URL,
-    placeModel,
-    undefined,
-    err => {
-      console.error('No se pudo cargar el soldado', err);
-      say('No se pudo cargar assets/scene.gltf');
-    }
-  );
+  (async () => {
+    await shrinkTextures(mgr);
+    new GLTFLoader(mgr).load(
+      MODEL_URL,
+      placeModel,
+      undefined,
+      err => {
+        console.error('No se pudo cargar el soldado', err);
+        say('No se pudo cargar assets/scene.gltf');
+      }
+    );
+  })();
 
   const pos = e => (matchMedia('(orientation:portrait)').matches ? e.clientY : e.clientX);
   const cvs = renderer.domElement;
