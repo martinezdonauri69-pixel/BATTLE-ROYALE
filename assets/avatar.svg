@@ -1,1 +1,13 @@
-<script src="extras2.js"></script>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="bg" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="#1c4fa8"/><stop offset="1" stop-color="#060b1c"/></radialGradient>
+    <linearGradient id="hood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a3350"/><stop offset="1" stop-color="#0a0e1c"/></linearGradient>
+  </defs>
+  <rect width="100" height="100" fill="url(#bg)"/>
+  <path d="M10 100C12 70 28 58 50 58s38 12 40 42z" fill="url(#hood)"/>
+  <path d="M26 56C22 28 34 12 50 12s28 16 24 44c-6 8-14 12-24 12S32 64 26 56z" fill="url(#hood)" stroke="#3a4670" stroke-width="1.5"/>
+  <path d="M34 42c0-10 6-17 16-17s16 7 16 17c0 12-6 22-16 22S34 54 34 42z" fill="#05070d"/>
+  <path d="M38 42l8 2-8 3zM62 42l-8 2 8 3z" fill="#38b6ff"/>
+  <circle cx="42" cy="44" r="2.2" fill="#8fd4ff"/><circle cx="58" cy="44" r="2.2" fill="#8fd4ff"/>
+  <path d="M50 20v6" stroke="#f5c04a" stroke-width="2" stroke-linecap="round"/>
+</svg>
