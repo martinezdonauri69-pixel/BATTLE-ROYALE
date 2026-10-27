@@ -1,152 +1,254 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Zona Final</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
-<script type="importmap">
-{"imports":{
-"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-</script>
-<style>
-*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;color:#fff;background:#05080f;font-family:'Barlow Condensed','Arial Narrow',Arial,sans-serif;font-weight:600}
-[hidden]{display:none!important}
-button{font:inherit;color:inherit;border:0;cursor:pointer}
-#app{position:fixed;inset:0;overflow:hidden;background:#0b0f1a url(assets/fondo.png) center/cover no-repeat}
-@media (orientation:portrait){
- #app{inset:auto;top:0;left:100vw;width:100vh;width:100dvh;height:100vw;transform-origin:0 0;transform:rotate(90deg)}
-}
-#scene{position:absolute;inset:0;z-index:0}
-#scene canvas{display:block;width:100%;height:100%;touch-action:none}
-.ui{position:absolute;inset:0;z-index:1;pointer-events:none}
-.ui>*{pointer-events:auto}
-.grow{flex:1}
-#top{position:absolute;left:8px;right:8px;top:6px;display:flex;align-items:center;gap:6px;pointer-events:none}
-#top>*{pointer-events:auto}
-#profile{display:flex;gap:8px;align-items:center;background:linear-gradient(90deg,rgba(8,12,22,.85),rgba(8,12,22,.4));padding:4px 14px 4px 4px;border-bottom:2px solid #ffd23a;min-width:150px;cursor:pointer}
-#av{width:40px;height:40px;display:grid;place-items:center;font-size:18px;font-weight:700;background:linear-gradient(135deg,#2f8bff,#123b8c)}
-.pinfo{display:flex;flex-direction:column;line-height:1.05}
-.pinfo b{font-size:17px}.pinfo small{opacity:.8;font-size:13px}
-.xp{height:4px;width:110px;background:rgba(255,255,255,.2);margin-top:3px}
-.xp i{display:block;height:100%;width:0;background:#ffd23a}
-.cur{display:flex;align-items:center;gap:6px;background:rgba(8,12,22,.7);padding:2px 2px 2px 8px;border-radius:4px}
-.cur b{font-size:17px;min-width:42px}
-.plus{width:30px;height:30px;background:#ffd23a;color:#111;font-size:20px;font-weight:700}
-.ico{width:36px;height:36px;background:rgba(8,12,22,.7);border-radius:4px;font-size:18px}
-#menu{position:absolute;left:8px;top:58px;width:170px;display:flex;flex-direction:column;gap:5px}
-#menu button{background:rgba(8,12,22,.72);padding:9px 10px;text-align:left;font-size:17px;letter-spacing:.5px;border-left:3px solid transparent}
-#menu button:active{border-left-color:#ffd23a;background:rgba(20,28,48,.9)}
-#menu .pass{background:linear-gradient(90deg,rgba(40,60,110,.9),rgba(8,12,22,.6));padding:12px 10px}
-#menu .pass span{display:block;font-size:19px;font-weight:700}
-#menu .pass small{opacity:.8}
-#menu .inv{text-align:center;opacity:.9}
-#side{position:absolute;right:8px;bottom:52px;width:280px;max-width:42%;display:flex;flex-direction:column;gap:6px}
-#maps{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:6px;scrollbar-width:none}
-#maps::-webkit-scrollbar{display:none}
-.map{flex:0 0 100%;scroll-snap-align:start;min-height:62px;padding:6px 10px;text-align:left;border:2px solid transparent;background:linear-gradient(135deg,var(--a),var(--b));position:relative}
-.map::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.55),rgba(0,0,0,0) 70%)}
-.map span{position:relative;z-index:1;display:block}
-.map .mt{font-size:19px;font-weight:700}
-.map .md{font-size:12px;opacity:.9;line-height:1.1}
-.map.sel{border-color:#ffd23a}
-.seg{display:flex;background:rgba(8,12,22,.75)}
-.seg button{flex:1;background:none;padding:8px 4px;font-size:16px;border-bottom:3px solid transparent;opacity:.8}
-.seg button.sel{color:#ffd23a;opacity:1;border-bottom-color:#ffd23a;background:rgba(255,210,58,.12)}
-#play{background:linear-gradient(180deg,#ffe25a,#f5b800);color:#111;font-size:28px;font-weight:700;padding:8px;letter-spacing:1px}
-#play:active{transform:scale(.98)}
-#dock{position:absolute;left:0;right:0;bottom:0;height:46px;display:flex;background:rgba(6,9,16,.88)}
-#dock button{flex:1;background:none;font-size:15px;letter-spacing:.5px;border-right:1px solid rgba(255,255,255,.08)}
-#dock button:active{background:rgba(255,210,58,.15)}
-#panel{position:absolute;inset:0;z-index:5;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:10px}
-.pcard{width:min(560px,96%);max-height:100%;overflow:auto;background:#111827;border:1px solid rgba(255,255,255,.12);border-top:3px solid #ffd23a;padding:10px 14px 14px}
-.phead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.phead h2{font-size:24px}
-#pclose{background:#1f2937;width:34px;height:34px;font-size:16px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.row b{display:block;font-size:17px}.row small{display:block;opacity:.7;font-size:13px}
-.row em{font-style:normal;opacity:.65;font-size:14px;white-space:nowrap}
-.b{background:#2b3550;padding:8px 12px;font-size:15px;border-radius:3px;white-space:nowrap}
-.b.y{background:#ffd23a;color:#111}
-.b.off{background:#1a2030;opacity:.85}
-.bar{height:6px;background:rgba(255,255,255,.15);margin-top:5px;width:100%}
-.bar i{display:block;height:100%;background:#ffd23a}
-input[type=text]{background:#0b1020;border:1px solid #334;color:#fff;padding:7px;font:inherit;width:140px}
-input[type=range]{width:150px}
-#loading{position:absolute;inset:0;z-index:9;background:rgba(5,8,15,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:16px}
-.ltrack{width:min(60%,420px);height:8px;background:#222}
-#lbar{display:block;height:100%;width:0;background:#ffd23a;transition:width .5s}
-#lcancel{background:#2b3550;padding:9px 18px;font-size:17px;margin-top:6px}
-#lnote{opacity:.8;max-width:420px}
-#toast{position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:rgba(8,12,22,.95);border:1px solid #ffd23a;padding:8px 16px;z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
-#toast.on{opacity:1}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#05070d">
+<meta name="mobile-web-app-capable" content="yes">
+<title>DMR POOL EMPIRE</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="app">
- <div id="scene"></div>
 
- <div class="ui">
-  <div id="top">
-   <div id="profile" data-open="rank">
-    <div id="av">DO</div>
-    <div class="pinfo"><b id="pname">Jugador</b><small id="plvl">Nv. 1</small><div class="xp"><i id="xpbar"></i></div></div>
-   </div>
-   <div class="grow"></div>
-   <div class="cur"><span>🪙</span><b id="coins">0</b><button class="plus" data-open="shop">+</button></div>
-   <div class="cur"><span>💎</span><b id="gems">0</b><button class="plus" data-open="shop">+</button></div>
-   <button class="ico" data-open="friends">👥</button>
-   <button class="ico" data-open="mail">✉️</button>
-   <button class="ico" data-open="settings">⚙️</button>
+<!-- ============ Sprite de iconos (24x24, trazo) ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2 3h3l2.5 12h11L21 7H6"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.5 3.5-7 8-7s8 2.5 8 7"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><circle cx="17.5" cy="9" r="2.8"/><path d="M17 14c3.5 0 5 1.8 5 5"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 21V11M12 21V4M19 21V14" stroke-width="3"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="6.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18M12 9C9 9 7.5 4.5 10 4.5S12 9 12 9zM12 9c3 0 4.5-4.5 2-4.5S12 9 12 9z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H3c0 4 2 5 4 5M17 6h4c0 4-2 5-4 5M12 14v4M8 21h8M9 18h6"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 13l2.5 2.5 4.5-5"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-width="3.2"/></symbol>
+    <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><path d="M12 9v6M10 12h4"/></symbol>
+    <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M5.5 9v.01M18.5 15v.01"/></symbol>
+    <symbol id="i-gem" viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9zM2 9h20M9 3l-2 6 5 12M15 3l2 6-5 12"/></symbol>
+    <symbol id="i-cue" viewBox="0 0 24 24"><path d="M3 21L19 5" stroke-width="2.6"/><path d="M19 5l2-2" stroke-width="3.4"/><path d="M6 18l2 2" stroke-width="2"/></symbol>
+    <symbol id="i-ball" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="10" r="3.8"/><path d="M12 8.4v3.2" stroke-width="1.6"/></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><path d="M3 8l2-3h14l2 3v8l-2 3H5l-2-3z"/><path d="M6 9h12v6H6z"/></symbol>
+    <symbol id="i-cards" viewBox="0 0 24 24"><rect x="3" y="6" width="10" height="14" rx="1.6" transform="rotate(-10 8 13)"/><rect x="11" y="4" width="10" height="14" rx="1.6" transform="rotate(10 16 11)"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.4"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19" stroke-width="3"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  </defs>
+</svg>
+
+<div id="viewport">
+<div id="stage">
+
+  <!-- ============ Fondo ============ -->
+  <img id="bg" src="assets/bg.svg" alt="" draggable="false">
+  <img id="table" src="assets/table.svg" alt="" draggable="false">
+  <div id="vignette"></div>
+
+  <!-- ============ 1. Perfil (arriba izquierda) ============ -->
+  <button id="profile" class="panel btn enter" data-action="profile" aria-label="Perfil">
+    <span class="avatar"><img src="assets/avatar.svg" alt="" draggable="false"></span>
+    <span class="pinfo">
+      <span class="pname"><b id="pName">—</b><svg class="ic gold"><use href="#i-crown"/></svg></span>
+      <span class="prank" id="pRank">—</span>
+      <span class="xp"><i id="xpFill"></i><em id="xpText">— / —</em></span>
+    </span>
+    <span class="lvl" id="pLevel">—</span>
+  </button>
+
+  <!-- ============ 2. Monedas / ajustes / mensajes (arriba derecha) ============ -->
+  <div id="wallet" class="enter">
+    <div class="res panel">
+      <svg class="ic green"><use href="#i-cash"/></svg><b id="coins">—</b>
+      <button class="plus btn" data-action="getCoins" data-i18n-title="getCoins" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
+    </div>
+    <div class="res panel">
+      <svg class="ic gold"><use href="#i-coin"/></svg><b id="gems">—</b>
+      <button class="plus btn" data-action="getGems" data-i18n-title="getCoins" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
+    </div>
+    <button class="sq panel btn" data-action="settings" data-i18n-title="settings"><svg class="ic"><use href="#i-gear"/></svg></button>
+    <button class="sq panel btn" data-action="messages" data-i18n-title="messages"><svg class="ic"><use href="#i-mail"/></svg></button>
   </div>
 
-  <div id="menu">
-   <button class="pass" data-open="pass"><span>PASE DE BATALLA</span><small>Recompensas</small></button>
-   <button data-open="shop">🛒 TIENDA</button>
-   <button data-open="events">📅 EVENTOS</button>
-   <button data-open="missions">✅ MISIONES</button>
-   <button data-open="clan">🛡️ CLAN</button>
-   <button id="invite" class="inv">＋ Invitar amigo</button>
+  <!-- ============ 3. Logo ============ -->
+  <div id="logoWrap" class="enter">
+    <img id="logo" src="assets/logo.svg" alt="DMR POOL EMPIRE" draggable="false">
+    <p id="slogan" data-i18n="logoSlogan"></p>
   </div>
 
-  <div id="side">
-   <div id="maps"></div>
-   <div id="modes" class="seg"></div>
-   <div class="seg">
-    <button data-cam="FPP">FPP</button>
-    <button data-cam="TPP">TPP</button>
-   </div>
-   <button id="play">INICIAR</button>
+  <!-- ============ Banner de eventos ============ -->
+  <button id="eventBanner" class="panel btn enter" data-action="events">
+    <svg class="ic big blue"><use href="#i-gem"/></svg>
+    <span><small data-i18n="events"></small><b data-i18n="noActive"></b></span>
+  </button>
+
+  <!-- ============ 4. Lateral izquierdo ============ -->
+  <nav id="sidebar" class="panel enter" aria-label="Menú">
+    <button class="side btn active" data-action="home"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="home"></span></button>
+    <button class="side btn" data-action="shop"><svg class="ic"><use href="#i-cart"/></svg><span data-i18n="shop"></span></button>
+    <button class="side btn" data-action="profile"><svg class="ic"><use href="#i-user"/></svg><span data-i18n="profile"></span></button>
+    <button class="side btn" data-action="friends"><svg class="ic"><use href="#i-users"/></svg><span data-i18n="friends"></span></button>
+    <button class="side btn" data-action="messages"><svg class="ic"><use href="#i-mail"/></svg><span data-i18n="messages"></span></button>
+    <button class="side btn" data-action="ranking"><svg class="ic"><use href="#i-chart"/></svg><span data-i18n="ranking"></span></button>
+    <button class="side btn" data-action="settings"><svg class="ic"><use href="#i-gear"/></svg><span data-i18n="settings"></span></button>
+  </nav>
+
+  <!-- ============ 5. Tres tarjetas centrales ============ -->
+  <button id="cardPlay" class="card gold btn enter" data-action="play">
+    <svg class="art" viewBox="0 0 300 150" aria-hidden="true">
+      <defs>
+        <radialGradient id="g8" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#4a4f5c"/><stop offset=".45" stop-color="#14161c"/><stop offset="1" stop-color="#000"/></radialGradient>
+        <linearGradient id="gcue" x1="0" x2="1"><stop offset="0" stop-color="#7a4a12"/><stop offset=".5" stop-color="#ffd97a"/><stop offset="1" stop-color="#8a5a18"/></linearGradient>
+      </defs>
+      <g transform="rotate(-24 150 80)"><rect x="-10" y="74" width="330" height="9" rx="4" fill="url(#gcue)"/><rect x="226" y="74" width="44" height="9" fill="#1a1a1a"/><rect x="-14" y="74" width="12" height="9" fill="#60b8ff"/></g>
+      <ellipse cx="170" cy="138" rx="54" ry="8" fill="#000" opacity=".5"/>
+      <circle cx="170" cy="78" r="58" fill="url(#g8)" stroke="#f5c04a" stroke-width="2"/>
+      <circle cx="170" cy="70" r="26" fill="#fff"/>
+      <text x="170" y="82" text-anchor="middle" font-family="Impact,'Arial Black',sans-serif" font-size="38" fill="#111">8</text>
+      <ellipse cx="148" cy="46" rx="15" ry="8" fill="#fff" opacity=".18" transform="rotate(-30 148 46)"/>
+    </svg>
+    <h2 data-i18n="play"></h2>
+    <p data-i18n="playSub"></p>
+  </button>
+
+  <button id="cardTour" class="card blue btn enter" data-action="tournaments">
+    <svg class="art" viewBox="0 0 300 150" aria-hidden="true">
+      <defs>
+        <linearGradient id="gcup" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff1b0"/><stop offset=".5" stop-color="#f5c04a"/><stop offset="1" stop-color="#9a6410"/></linearGradient>
+      </defs>
+      <circle cx="150" cy="80" r="62" fill="#38b6ff" opacity=".16"/>
+      <path d="M105 30h90v40a45 45 0 0 1-90 0z" fill="url(#gcup)"/>
+      <path d="M105 42H78c0 26 14 38 30 40M195 42h27c0 26-14 38-30 40" fill="none" stroke="url(#gcup)" stroke-width="9" stroke-linecap="round"/>
+      <rect x="140" y="112" width="20" height="16" fill="url(#gcup)"/>
+      <rect x="112" y="126" width="76" height="14" rx="4" fill="url(#gcup)"/>
+      <path d="M150 42l7 14 15 2-11 10 3 15-14-8-14 8 3-15-11-10 15-2z" fill="#fff6cf" opacity=".9"/>
+      <circle cx="62" cy="38" r="3" fill="#bfe6ff"/><circle cx="240" cy="48" r="2.5" fill="#bfe6ff"/><circle cx="232" cy="118" r="3" fill="#f5c04a"/>
+    </svg>
+    <h2 data-i18n="tournaments"></h2>
+    <p data-i18n="tournamentsSub"></p>
+  </button>
+
+  <button id="cardFriend" class="card violet btn enter" data-action="friendly">
+    <svg class="art" viewBox="0 0 300 150" aria-hidden="true">
+      <defs>
+        <linearGradient id="gvL" x1="0" x2="1"><stop offset="0" stop-color="#38b6ff"/><stop offset="1" stop-color="#1a4fd0"/></linearGradient>
+        <linearGradient id="gvR" x1="0" x2="1"><stop offset="0" stop-color="#ffd97a"/><stop offset="1" stop-color="#c8860d"/></linearGradient>
+      </defs>
+      <circle cx="96" cy="52" r="24" fill="url(#gvL)"/><path d="M50 138c0-38 20-56 46-56s46 18 46 56z" fill="url(#gvL)"/>
+      <circle cx="204" cy="52" r="24" fill="url(#gvR)"/><path d="M158 138c0-38 20-56 46-56s46 18 46 56z" fill="url(#gvR)"/>
+      <text x="150" y="92" text-anchor="middle" font-family="Impact,'Arial Black',sans-serif" font-size="46" font-style="italic" fill="#fff" stroke="#0a0620" stroke-width="3" paint-order="stroke">VS</text>
+    </svg>
+    <h2 data-i18n="friendly"></h2>
+    <p data-i18n="friendlySub"></p>
+  </button>
+
+  <!-- ============ 6. Lateral derecho ============ -->
+  <div id="rtop" class="panel enter">
+    <button class="rt btn" data-action="ranks"><svg class="ic gold"><use href="#i-crown"/></svg><span data-i18n="ranks"></span></button>
+    <button class="rt btn" data-action="rewards"><svg class="ic gold"><use href="#i-gift"/></svg><span data-i18n="rewards"></span></button>
+    <button class="rt btn" data-action="events"><svg class="ic gold"><use href="#i-calendar"/></svg><span data-i18n="events"></span></button>
+    <button class="rt btn" data-action="tournaments"><svg class="ic gold"><use href="#i-trophy"/></svg><span data-i18n="tournamentsShort"></span></button>
   </div>
 
-  <div id="dock">
-   <button data-open="weapons">🔫 ARMAS</button>
-   <button data-open="character">🪖 PERSONAJE</button>
-   <button data-open="inventory">🎒 INVENTARIO</button>
-   <button data-open="rank">🎖️ RANGO</button>
-   <button data-open="settings">⚙️ AJUSTES</button>
+  <button id="rShop" class="rbig panel btn enter" data-action="shop">
+    <svg class="ic big gold"><use href="#i-cart"/></svg>
+    <span class="txt"><b class="gold" data-i18n="shop"></b><small data-i18n="shopSub"></small></span>
+    <svg class="ic chev"><use href="#i-chev"/></svg>
+  </button>
+
+  <button id="rPass" class="rbig panel btn enter" data-action="pass">
+    <span class="badge" id="passLvl">—</span>
+    <span class="txt"><b class="gold" data-i18n="seasonPass"></b><span class="bar"><i id="passFill"></i><em id="passText">— / —</em></span></span>
+    <svg class="ic chev"><use href="#i-chev"/></svg>
+  </button>
+
+  <button id="rMission" class="rbig panel btn enter" data-action="missions">
+    <svg class="ic big gold"><use href="#i-clipboard"/></svg>
+    <span class="txt"><b class="gold" data-i18n="dailyMissions"></b><small data-i18n="noMissions"></small><span class="bar"><i id="misFill"></i><em id="misText">— / —</em></span></span>
+    <svg class="ic chev"><use href="#i-chev"/></svg>
+  </button>
+
+  <button id="rOffer" class="panel btn enter" data-action="offers">
+    <b class="gold" data-i18n="specialOffer"></b>
+    <svg class="art" viewBox="0 0 160 70" aria-hidden="true">
+      <rect x="18" y="26" width="86" height="38" rx="4" fill="#1e7d3a" stroke="#7be08f" stroke-width="2" transform="rotate(-8 60 45)"/>
+      <rect x="34" y="18" width="86" height="38" rx="4" fill="#25913f" stroke="#9af0a8" stroke-width="2" transform="rotate(4 77 37)"/>
+      <circle cx="77" cy="37" r="11" fill="none" stroke="#d8ffe0" stroke-width="3"/>
+      <circle cx="132" cy="48" r="16" fill="#f5c04a" stroke="#fff1b0" stroke-width="3"/><circle cx="132" cy="48" r="9" fill="none" stroke="#9a6410" stroke-width="2"/>
+    </svg>
+    <small data-i18n="noOffers"></small>
+  </button>
+
+  <!-- ============ 7. Accesos rápidos (parte inferior) ============ -->
+  <div id="quick" class="panel enter">
+    <button class="qk btn" data-action="cues"><svg class="ic big"><use href="#i-cue"/></svg><span data-i18n="cues"></span></button>
+    <button class="qk btn" data-action="balls"><svg class="ic big"><use href="#i-ball"/></svg><span data-i18n="balls"></span></button>
+    <button class="qk btn" data-action="tables"><svg class="ic big"><use href="#i-table"/></svg><span data-i18n="tables"></span></button>
+    <button class="qk btn" data-action="collection"><svg class="ic big"><use href="#i-cards"/></svg><span data-i18n="collection"></span></button>
+    <button class="qk btn" data-action="achievements"><svg class="ic big"><use href="#i-trophy"/></svg><span data-i18n="achievements"></span></button>
+    <button class="qk btn more" data-action="more"><svg class="ic big"><use href="#i-more"/></svg><span data-i18n="more"></span></button>
   </div>
- </div>
 
- <div id="panel" hidden>
-  <div class="pcard">
-   <div class="phead"><h2 id="ptitle"></h2><button id="pclose">✕</button></div>
-   <div id="pbody"></div>
+  <button id="online" class="panel btn enter" data-action="online">
+    <svg class="ic big blue"><use href="#i-globe"/></svg>
+    <span class="txt"><small data-i18n="onlinePlayers"></small><b id="onlineCount">—</b></span>
+  </button>
+
+  <!-- ============ 8. JUEGA AHORA ============ -->
+  <button id="playNow" class="btn enter" data-action="play">
+    <span data-i18n="playNow"></span>
+    <svg class="ic"><use href="#i-play"/></svg>
+  </button>
+
+  <!-- ============ 9. Zona inferior ============ -->
+  <button id="winners" class="panel btn enter" data-action="ranking">
+    <svg class="ic gold"><use href="#i-crown"/></svg>
+    <span class="wl" data-i18n="lastWinners"></span>
+    <span class="wlist" id="winnersList"><span class="muted" data-i18n="noWinners"></span></span>
+  </button>
+
+  <label id="langBox" class="panel enter">
+    <svg class="ic blue"><use href="#i-globe"/></svg>
+    <select id="langSel" aria-label="Idioma / Language"></select>
+  </label>
+
+  <div id="tagline" class="enter" data-i18n="tagline"></div>
+
+  <!-- ============ Ventana modal ============ -->
+  <div id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="dialog panel">
+      <header><svg class="ic gold" id="mIcon"><use href="#i-star"/></svg><h3 id="mTitle"></h3>
+        <button class="x btn" id="mClose" data-i18n-title="close" aria-label="Cerrar"><svg class="ic"><use href="#i-close"/></svg></button>
+      </header>
+      <div id="mBody"></div>
+    </div>
   </div>
- </div>
 
- <div id="loading" hidden>
-  <h2 id="ltitle"></h2>
-  <div class="ltrack"><i id="lbar"></i></div>
-  <p id="lmsg"></p>
-  <p id="lnote" hidden>La partida real llegará en las siguientes partes del juego.</p>
-  <button id="lcancel">Cancelar</button>
- </div>
-
- <div id="toast"></div>
+  <div id="toast" role="status"></div>
 </div>
-<script type="module" src="js/ui.js"></script>
+</div>
+
+<!-- Aviso si el móvil está en vertical -->
+<div id="rotate"><div><svg class="ic" viewBox="0 0 24 24" width="64" height="64"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M20 8l2 3-3 1" /></svg><p id="rotateText">—</p></div></div>
+
+<noscript><p style="color:#fff;padding:20px">DMR POOL EMPIRE necesita JavaScript.</p></noscript>
+
+<!-- Orden de carga importante (scripts clásicos: funciona también abriendo index.html sin servidor) -->
+<script src="js/config.js"></script>
+<script src="js/store.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/services.js"></script>
+<script src="js/catalog.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
