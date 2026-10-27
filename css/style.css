@@ -1,1 +1,246 @@
-<script src="extras2.js"></script>
+/* =====================================================================
+   DMR POOL EMPIRE — Menú principal
+   El escenario es de 1600x900 y se escala por JS (ui.js -> fit()) para
+   mantener SIEMPRE las mismas posiciones y proporciones en cualquier pantalla.
+   ===================================================================== */
+:root{
+  --black:#05070d; --ink:#0a1020;
+  --gold:#f5c04a; --gold-hi:#ffe9a6; --gold-lo:#b97a10;
+  --blue:#2aa2ff; --blue-hi:#8fd4ff; --blue-lo:#0b3d8a;
+  --violet:#6a5cff;
+  --txt:#eaf2ff; --muted:#8fa3c4; --green:#5fe07f;
+  --font:"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Noto Sans CJK SC","Noto Sans CJK JP","Noto Sans CJK KR","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --display:Impact,"Arial Black","Segoe UI",Roboto,"Noto Sans",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--black);color:var(--txt);font-family:var(--font);
+  -webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;text-align:left}
+img{display:block;-webkit-user-drag:none}
+#viewport{position:fixed;inset:0;overflow:hidden;background:var(--black)}
+#stage{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0;overflow:hidden;background:#05070d}
+
+/* ---------- iconos ---------- */
+.ic{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ic.big{width:46px;height:46px}
+.gold{color:var(--gold)} .blue{color:var(--blue-hi)} .green{color:var(--green)}
+b.gold{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 55%,var(--gold-lo));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ---------- fondo ---------- */
+#bg{position:absolute;inset:0;width:1600px;height:900px;object-fit:cover}
+#table{position:absolute;left:330px;top:548px;width:900px;height:190px;filter:drop-shadow(0 18px 24px rgba(0,0,0,.65));animation:tableGlow 6s ease-in-out infinite}
+#vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 45%,rgba(0,0,0,.65) 100%),linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,0) 20%,rgba(0,0,0,0) 80%,rgba(0,0,0,.55));pointer-events:none}
+@keyframes tableGlow{0%,100%{filter:drop-shadow(0 18px 24px rgba(0,0,0,.65)) drop-shadow(0 0 10px rgba(42,162,255,.25))}50%{filter:drop-shadow(0 18px 24px rgba(0,0,0,.65)) drop-shadow(0 0 26px rgba(42,162,255,.55))}}
+
+/* ---------- panel oscuro con borde luminoso ---------- */
+.panel{position:absolute;background:linear-gradient(180deg,rgba(16,24,46,.9),rgba(5,8,18,.92));
+  border:2px solid rgba(245,192,74,.6);border-radius:14px;
+  box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 18px rgba(42,162,255,.28),inset 0 0 22px rgba(42,162,255,.1);
+  backdrop-filter:blur(3px)}
+
+/* ---------- botones: efecto al pulsar ---------- */
+.btn{position:relative;overflow:hidden;transition:transform .16s ease,filter .2s ease,box-shadow .2s ease,border-color .2s ease}
+.btn:hover{transform:translateY(-3px);filter:brightness(1.18);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 26px rgba(245,192,74,.45),inset 0 0 22px rgba(42,162,255,.16)}
+.btn:active{transform:translateY(0) scale(.96);filter:brightness(1.4)}
+.btn:focus-visible{outline:3px solid var(--blue-hi);outline-offset:2px}
+/* .btn pone position:relative; estos elementos deben seguir en absoluto (se colocan por id/clase) */
+.panel.btn,.card.btn{position:absolute}
+.ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+
+/* ---------- animación de entrada ---------- */
+/* "backwards": al terminar la entrada, hover/pulsar vuelven a funcionar */
+.enter{animation:enter .7s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes enter{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+#sidebar{animation-delay:.05s} #profile{animation-delay:.1s} #wallet{animation-delay:.15s} #logoWrap{animation-delay:.1s}
+#cardPlay{animation-delay:.2s} #cardTour{animation-delay:.28s} #cardFriend{animation-delay:.36s}
+#rtop{animation-delay:.2s} #rShop{animation-delay:.26s} #rPass{animation-delay:.32s} #rMission{animation-delay:.38s} #rOffer{animation-delay:.44s}
+#quick{animation-delay:.4s} #online{animation-delay:.46s} #playNow{animation-delay:.5s} #winners,#langBox,#tagline{animation-delay:.55s}
+
+/* ---------- 1. perfil ---------- */
+#profile{left:16px;top:16px;width:430px;height:114px;display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:16px}
+.avatar{width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);overflow:hidden;flex:none;box-shadow:0 0 14px rgba(245,192,74,.5)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.pname{display:flex;align-items:center;gap:8px;font-size:26px;font-weight:800;letter-spacing:.5px;white-space:nowrap;overflow:hidden}
+.pname b{overflow:hidden;text-overflow:ellipsis}
+.pname .ic{width:24px;height:24px}
+.prank{font-size:16px;color:var(--blue-hi);font-weight:600}
+.xp{position:relative;height:20px;border-radius:10px;background:#0b1224;border:1px solid rgba(245,192,74,.5);overflow:hidden}
+.xp i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold),var(--gold-hi));transition:width .8s ease}
+.xp em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:13px;font-weight:700;text-shadow:0 1px 2px #000}
+.lvl{position:absolute;left:62px;top:70px;min-width:40px;height:40px;padding:0 6px;display:grid;place-items:center;font-weight:900;font-size:19px;color:#1a1204;
+  background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,var(--gold-lo));border:2px solid #fff3c4;border-radius:12px;transform:rotate(0)}
+
+/* ---------- 2. monedas ---------- */
+#wallet{position:absolute;right:14px;top:14px;display:flex;gap:10px;align-items:center;height:50px}
+#wallet .panel,#wallet .panel.btn{position:relative}
+.res{height:50px;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;border-radius:25px;min-width:190px}
+.res .ic{width:28px;height:28px}
+.res b{flex:1;font-size:21px;font-weight:800;letter-spacing:.5px}
+.plus{width:36px;height:36px;border-radius:50%;background:linear-gradient(180deg,#58c0ff,#1260d8);border:2px solid #bfe6ff;display:grid;place-items:center}
+.plus .ic{width:20px;height:20px;stroke:#fff}
+.sq{width:50px;height:50px;display:grid;place-items:center;border-radius:12px}
+.sq .ic{width:28px;height:28px}
+
+/* ---------- 3. logo ---------- */
+#logoWrap{position:absolute;left:600px;top:6px;width:400px;text-align:center}
+#logo{width:400px;height:250px;animation:logoFloat 5s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(245,192,74,.55))}
+@keyframes logoFloat{0%,100%{transform:translateY(0) scale(1);filter:drop-shadow(0 0 12px rgba(245,192,74,.45))}50%{transform:translateY(-6px) scale(1.02);filter:drop-shadow(0 0 28px rgba(60,170,255,.75))}}
+#slogan{margin-top:-6px;font-size:14px;color:#cfe3ff;text-shadow:0 1px 6px #000;letter-spacing:.3px}
+
+/* ---------- banner de eventos ---------- */
+#eventBanner{left:143px;top:164px;width:372px;height:112px;display:flex;align-items:center;gap:16px;padding:0 22px;border-color:rgba(42,162,255,.8)}
+#eventBanner span{display:flex;flex-direction:column;gap:4px}
+#eventBanner small{font-size:15px;color:var(--blue-hi);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+#eventBanner b{font-size:22px;font-weight:800}
+
+/* ---------- 4. lateral izquierdo ---------- */
+#sidebar{left:0;top:142px;width:122px;height:648px;border-left:0;border-radius:0 16px 16px 0;display:flex;flex-direction:column;padding:6px 0}
+.side{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:15px;font-weight:700;color:#cfe0ff;border-radius:0}
+.side .ic{width:38px;height:38px}
+.side.active{color:#1a1204;background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,var(--gold-lo));box-shadow:inset 0 0 18px rgba(255,255,255,.35)}
+.side:hover{transform:none;background:rgba(42,162,255,.16)}
+.side.active:hover{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,var(--gold-lo))}
+
+/* ---------- 5. tarjetas ---------- */
+.card{position:absolute;top:348px;width:298px;height:214px;border-radius:18px;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 10px 14px;text-align:center}
+.card .art{position:absolute;left:0;top:0;width:100%;height:150px;pointer-events:none;transition:transform .35s ease}
+.card:hover .art{transform:scale(1.07) translateY(-4px)}
+.card h2{position:relative;font-family:var(--display);font-style:italic;font-size:44px;line-height:1;letter-spacing:1px;text-shadow:0 3px 8px rgba(0,0,0,.7)}
+.card p{position:relative;margin-top:4px;font-size:16px;font-weight:600;color:#dbe8ff;line-height:1.15}
+.card.gold{left:290px;border-color:var(--gold);background:radial-gradient(ellipse at 50% 30%,#5a3c08,#1c1304 55%,#070503);box-shadow:0 0 30px rgba(245,192,74,.5),inset 0 0 40px rgba(245,192,74,.25)}
+.card.gold h2{color:var(--gold-hi)}
+.card.blue{left:606px;border-color:var(--blue);background:radial-gradient(ellipse at 50% 30%,#0e4aa6,#06204a 55%,#020a18);box-shadow:0 0 30px rgba(42,162,255,.6),inset 0 0 40px rgba(42,162,255,.3)}
+.card.blue h2{color:#e9f6ff}
+.card.violet{left:922px;border-color:#8d7bff;background:radial-gradient(ellipse at 50% 30%,#3d2aa8,#1a1050 55%,#07041a);box-shadow:0 0 30px rgba(120,100,255,.6),inset 0 0 40px rgba(120,100,255,.3)}
+.card.violet h2{color:#efeaff}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-120%);animation:sheen 5s ease-in-out infinite;pointer-events:none}
+#cardTour::after{animation-delay:1.2s} #cardFriend::after{animation-delay:2.4s}
+@keyframes sheen{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+
+/* ---------- 6. lateral derecho ---------- */
+#rtop{left:1260px;top:94px;width:326px;height:82px;display:flex;padding:0}
+.rt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:13px;font-weight:700;color:#dfeaff;border-radius:0}
+.rt .ic{width:34px;height:34px}
+.rt:hover{transform:none;background:rgba(245,192,74,.14)}
+.rbig{left:1260px;width:326px;display:flex;align-items:center;gap:14px;padding:0 16px}
+.rbig .txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.rbig .txt b{font-size:26px;font-weight:800;line-height:1.05}
+.rbig small{font-size:14px;color:#c4d6f5;line-height:1.2}
+.rbig .chev{width:26px;height:26px;color:var(--gold)}
+#rShop{top:195px;height:82px}
+#rPass{top:294px;height:88px}
+#rMission{top:395px;height:94px}
+#rMission .txt b,#rPass .txt b{font-size:22px}
+.badge{width:52px;height:52px;flex:none;display:grid;place-items:center;font-size:22px;font-weight:900;color:#1a1204;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,var(--gold-hi),var(--gold) 60%,var(--gold-lo));border:3px solid #fff3c4;box-shadow:0 0 14px rgba(245,192,74,.6)}
+.bar{position:relative;display:block;height:16px;border-radius:8px;background:#0b1224;border:1px solid rgba(245,192,74,.5);overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--gold-lo),var(--gold));transition:width .8s ease}
+.bar em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;text-shadow:0 1px 2px #000}
+#rOffer{left:1260px;top:500px;width:326px;height:156px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center;
+  border-color:#ff5d5d;box-shadow:0 0 22px rgba(255,80,80,.35),inset 0 0 26px rgba(255,80,80,.12)}
+#rOffer b{font-family:var(--display);font-style:italic;font-size:26px;letter-spacing:.5px}
+#rOffer .art{width:160px;height:70px}
+#rOffer small{font-size:14px;color:#ffd0d0}
+
+/* ---------- 7. accesos rápidos ---------- */
+#quick{left:143px;top:698px;width:770px;height:92px;display:flex;padding:0}
+.qk{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:15px;font-weight:700;color:#e4eeff;border-radius:0}
+.qk .ic{color:var(--gold)}
+.qk:hover{transform:translateY(-3px)}
+.qk.more{flex:.6}
+.qk + .qk{border-left:1px solid rgba(245,192,74,.18)}
+
+#online{left:1108px;top:698px;width:200px;height:92px;display:flex;align-items:center;gap:12px;padding:0 16px;border-color:rgba(42,162,255,.8)}
+#online .txt{display:flex;flex-direction:column}
+#online small{font-size:13px;color:var(--muted);font-weight:600}
+#online b{font-size:26px;font-weight:800}
+
+/* ---------- 8. JUEGA AHORA ---------- */
+#playNow{position:absolute;left:1326px;top:696px;width:260px;height:94px;border-radius:16px;display:flex;align-items:center;justify-content:center;gap:12px;
+  font-family:var(--display);font-style:italic;font-size:32px;letter-spacing:1px;color:#fff;text-shadow:0 3px 6px rgba(0,0,0,.6);
+  background:linear-gradient(180deg,#58c0ff,#1260d8 55%,#0a3a9a);border:3px solid var(--gold);
+  box-shadow:0 0 28px rgba(42,162,255,.8),inset 0 0 22px rgba(255,255,255,.25);animation:pulse 2.4s ease-in-out infinite}
+#playNow .ic{width:34px;height:34px;color:var(--gold-hi)}
+@keyframes pulse{0%,100%{box-shadow:0 0 22px rgba(42,162,255,.7),inset 0 0 22px rgba(255,255,255,.25)}50%{box-shadow:0 0 42px rgba(42,162,255,1),0 0 18px rgba(245,192,74,.6),inset 0 0 22px rgba(255,255,255,.35)}}
+#playNow:hover{animation-play-state:paused}
+
+/* ---------- 9. zona inferior ---------- */
+#winners{left:16px;top:818px;width:900px;height:62px;display:flex;align-items:center;gap:14px;padding:0 18px}
+#winners .wl{font-weight:800;font-size:17px;color:var(--gold);white-space:nowrap}
+#winners .wlist{flex:1;display:flex;gap:18px;font-size:16px;font-weight:700;overflow:hidden}
+.muted{color:var(--muted);font-weight:600}
+#langBox{left:1100px;top:824px;width:230px;height:50px;display:flex;align-items:center;gap:10px;padding:0 12px;cursor:pointer}
+#langBox .ic{width:26px;height:26px}
+#langSel{flex:1;height:36px;background:#0b1224;color:var(--txt);border:1px solid rgba(42,162,255,.6);border-radius:8px;font:700 16px var(--font);padding:0 8px;cursor:pointer;min-width:0}
+#tagline{position:absolute;left:1346px;top:824px;width:244px;height:50px;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--display);font-style:italic;font-size:15px;line-height:1.1;color:var(--gold-hi);text-shadow:0 2px 6px #000}
+
+/* ---------- modal ---------- */
+#modal{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(2,4,10,.78);backdrop-filter:blur(5px)}
+#modal.open{display:flex;animation:fade .25s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.dialog{position:relative;width:940px;max-height:720px;display:flex;flex-direction:column;border-radius:20px;border-color:var(--gold);animation:pop .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.dialog header{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid rgba(245,192,74,.35)}
+.dialog header h3{flex:1;font-family:var(--display);font-style:italic;font-size:32px;letter-spacing:1px;color:var(--gold-hi)}
+.x{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.2)}
+.x .ic{width:22px;height:22px}
+#mBody{padding:22px;overflow:auto;max-height:620px}
+#mBody::-webkit-scrollbar{width:8px}#mBody::-webkit-scrollbar-thumb{background:var(--gold-lo);border-radius:4px}
+
+.empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:10px 20px}
+.empty .ic.big2{width:84px;height:84px;color:var(--blue-hi);opacity:.9}
+.empty .soon{font-family:var(--display);font-style:italic;font-size:34px;color:var(--gold-hi)}
+.empty .sub{font-size:18px;color:#c4d6f5}
+.dev{margin-top:14px;width:100%;text-align:left;background:rgba(42,162,255,.1);border:1px dashed var(--blue);border-radius:12px;padding:14px 18px;font-size:16px;line-height:1.35}
+.dev b{display:block;color:var(--blue-hi);margin-bottom:6px;font-size:15px;letter-spacing:.5px;text-transform:uppercase}
+.dev ul{margin-left:20px}.dev li{margin:3px 0}
+
+.tabs{display:flex;gap:10px;margin-bottom:16px}
+.tab{flex:1;height:52px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:18px;border-radius:12px;background:#0b1224;border:2px solid rgba(245,192,74,.3)}
+.tab.on{background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,var(--gold-lo));color:#1a1204;border-color:#fff3c4}
+.tab .ic{width:26px;height:26px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;border-radius:14px;background:linear-gradient(180deg,#101a34,#070b18);border:2px solid rgba(42,162,255,.4);text-align:center}
+.item .ic{width:60px;height:60px;color:var(--gold)}
+.item .nm{font-weight:800;font-size:17px;line-height:1.15;min-height:40px;display:flex;align-items:center}
+.item .pr{display:flex;align-items:center;gap:6px;font-weight:800;font-size:18px}
+.item .pr .ic{width:22px;height:22px}
+.item .st{font-size:13px;font-weight:800;padding:2px 10px;border-radius:10px;background:rgba(95,224,127,.18);color:var(--green)}
+.item .st.no{background:rgba(143,163,196,.15);color:var(--muted)}
+.item .buy{width:100%;height:40px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:16px;color:#fff;background:linear-gradient(180deg,#58c0ff,#1260d8)}
+.item .buy[disabled]{filter:grayscale(1);opacity:.5;cursor:not-allowed}
+.demo-tag{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:1px}
+
+.form{display:flex;flex-direction:column;gap:14px;max-width:560px;margin:0 auto}
+.form label{font-weight:700;color:var(--blue-hi)}
+.form input{height:52px;border-radius:10px;border:2px solid var(--blue);background:#0b1224;color:#fff;font:700 22px var(--font);padding:0 14px;-webkit-user-select:text;user-select:text}
+.primary{height:52px;border-radius:12px;font-weight:900;font-size:20px;text-align:center;color:#1a1204;background:linear-gradient(180deg,var(--gold-hi),var(--gold) 60%,var(--gold-lo));display:grid;place-items:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 14px}
+.stats div{background:#0b1224;border:1px solid rgba(245,192,74,.35);border-radius:12px;padding:12px;text-align:center}
+.stats small{display:block;color:var(--muted);font-weight:700}.stats b{font-size:24px}
+.langgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.langgrid .lg{height:60px;display:grid;place-items:center;font-weight:800;font-size:18px;border-radius:12px;background:#0b1224;border:2px solid rgba(42,162,255,.45);text-align:center}
+.langgrid .lg.on{border-color:var(--gold);background:linear-gradient(180deg,#3a2a08,#120c02);color:var(--gold-hi)}
+.menugrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.menugrid .mg{height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-weight:800;font-size:17px;border-radius:14px;background:linear-gradient(180deg,#101a34,#070b18);border:2px solid rgba(245,192,74,.4)}
+.menugrid .mg .ic{width:36px;height:36px;color:var(--gold)}
+.about{margin-top:16px;text-align:center;color:var(--muted);font-size:14px}
+
+/* ---------- toast ---------- */
+#toast{position:absolute;left:50%;bottom:130px;transform:translate(-50%,30px);z-index:60;padding:14px 26px;border-radius:14px;background:rgba(5,8,18,.95);border:2px solid var(--gold);
+  font-weight:800;font-size:18px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:760px;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- aviso vertical ---------- */
+#rotate{position:fixed;inset:0;z-index:999;display:none;align-items:center;justify-content:center;text-align:center;background:var(--black);color:var(--gold-hi);padding:30px}
+#rotate .ic{stroke:var(--gold);margin-bottom:14px;animation:rot 2.2s ease-in-out infinite}
+#rotate p{font-size:20px;font-weight:800;max-width:320px;margin:0 auto}
+@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+body.portrait #rotate{display:flex}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
