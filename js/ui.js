@@ -1,6 +1,6 @@
 /* =====================================================================
-   UI del menÃº: escalado, botones, ventanas (modales), tienda, perfil, ajustes.
-   Cada botÃ³n del HTML tiene data-action="nombre" -> se ejecuta ACTIONS[nombre].
+   UI del men\u00fa: escalado, botones, ventanas (modales), tienda, perfil, ajustes.
+   Cada bot\u00f3n del HTML tiene data-action="nombre" -> se ejecuta ACTIONS[nombre].
    ===================================================================== */
 (function () {
   "use strict";
@@ -73,12 +73,12 @@
   function devNotice(needs) {
     if (!DMR.config.showDevNotices || !needs || !needs.length) return null;
     return h("div", { class: "dev" },
-      h("b", {}, t("devNotice") + " Â· " + t("missing")),
+      h("b", {}, t("devNotice") + " \u00b7 " + t("missing")),
       h("ul", {}, needs.map(n => h("li", {}, n))));
   }
 
-  /* ---------- secciones genÃ©ricas ----------
-     id -> { title: clave i18n, icon, svc: Ã¡rea de DMR.services, call: mÃ©todo principal }
+  /* ---------- secciones gen\u00e9ricas ----------
+     id -> { title: clave i18n, icon, svc: \u00e1rea de DMR.services, call: m\u00e9todo principal }
      Si el servicio responde ok:true, se usa DMR.ui.renderers[id](data) para dibujarlo.   */
   const SECTIONS = {
     friends:      { title: "friends",       icon: "users",     svc: "friends",     call: "list" },
@@ -212,7 +212,7 @@
       devNotice(DMR.services.settings.needs)));
   }
 
-  /* ---------- acciones de juego (puntos de integraciÃ³n) ---------- */
+  /* ---------- acciones de juego (puntos de integraci\u00f3n) ---------- */
   function startAction(sectionId, svcName, method, eventName) {
     const svc = DMR.services[svcName];
     Promise.resolve(svc[method]()).then(r => {
@@ -221,7 +221,7 @@
     }).catch(() => openSection(sectionId));
   }
 
-  /* ---------- tabla de acciones: data-action -> funciÃ³n ---------- */
+  /* ---------- tabla de acciones: data-action -> funci\u00f3n ---------- */
   const ACTIONS = {
     home()         { closeModal(); },
     shop()         { openShop("cues"); },
@@ -250,19 +250,19 @@
     getGems()      { openSection("gems"); }
   };
 
-  /* ---------- cabecera (datos reales o "â€”") ---------- */
-  function num(n) { return typeof n === "number" ? n.toLocaleString(DMR.i18n.lang) : "â€”"; }
+  /* ---------- cabecera (datos reales o "\u2014") ---------- */
+  function num(n) { return typeof n === "number" ? n.toLocaleString(DMR.i18n.lang) : "\u2014"; }
 
   function refresh() {
     const S = DMR.services;
     $("#pName").textContent = DMR.store.get("name", "") || t("guest");
     $("#pRank").textContent = t("noRank");
-    $("#pLevel").textContent = "â€”";
-    $("#xpText").textContent = "â€” / â€”";
+    $("#pLevel").textContent = "\u2014";
+    $("#xpText").textContent = "\u2014 / \u2014";
     $("#xpFill").style.width = "0";
-    $("#coins").textContent = "â€”";
-    $("#gems").textContent = "â€”";
-    $("#onlineCount").textContent = "â€”";
+    $("#coins").textContent = "\u2014";
+    $("#gems").textContent = "\u2014";
+    $("#onlineCount").textContent = "\u2014";
 
     S.profile.getStats().then(r => {
       if (!r.ok) return;
@@ -286,7 +286,7 @@
       if (!r.ok || !Array.isArray(r.data) || !r.data.length) return;
       const box = $("#winnersList");
       box.replaceChildren();
-      r.data.slice(0, 3).forEach((w, i) => box.append(h("span", {}, (i + 1) + ". " + w.name + (w.prize ? " Â· " + w.prize : ""))));
+      r.data.slice(0, 3).forEach((w, i) => box.append(h("span", {}, (i + 1) + ". " + w.name + (w.prize ? " \u00b7 " + w.prize : ""))));
     });
   }
 
@@ -324,7 +324,7 @@
     $("#modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
     document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
     document.addEventListener("dmr:lang", refresh);
-    // evita el menÃº contextual al mantener pulsado en mÃ³vil
+    // evita el men\u00fa contextual al mantener pulsado en m\u00f3vil
     document.addEventListener("contextmenu", e => { if (e.target.tagName !== "INPUT") e.preventDefault(); });
 
     window.addEventListener("resize", fit);
