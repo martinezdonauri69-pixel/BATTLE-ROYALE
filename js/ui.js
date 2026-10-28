@@ -231,7 +231,7 @@
     profile()      { openProfile(); },
     settings()     { openSettings(); },
     more()         { DMR.more.open(); },
-    play()         { closeModal(); DMR.game.open(); },
+   play()         { closeModal(); try { DMR.game.open(); } catch (e) { alert("JUGAR fallo: " + e.message + " | game:" + !!DMR.game + " physics:" + !!DMR.physics + " rules:" + !!DMR.rules); } },
     friendly()     { startAction("friendly", "rooms", "createPrivate", "dmr:private-room"); },
     tournaments()  { openSection("tournaments"); },
     friends()      { openSection("friends"); },
