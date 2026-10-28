@@ -1,13 +1,13 @@
-/* Pantalla de juego: dibuja la mesa y maneja controles. La fÃ­sica y las reglas estÃ¡n en js/engine/. */
+/* Pantalla de juego: dibuja la mesa y maneja controles. La f\u00edsica y las reglas est\u00e1n en js/engine/. */
 (function () {
   "use strict";
   const P = DMR.physics, Rl = DMR.rules, T = P.T, R = T.R, RAIL = 90;
   const L = {
     es: { p1: "Jugador 1", p2: "Jugador 2", shoot: "TIRAR", place: "COLOCAR", power: "Fuerza", pause: "Pausa", resume: "Continuar",
-      restart: "Reiniciar", menu: "MenÃº", again: "Revancha", wins: "Â¡gana!", result: "Resultado", solids: "Lisas", stripes: "Rayadas", open: "Mesa abierta",
-      break: "Saque: apunta, ajusta la fuerza y pulsa TIRAR", again_: "Â¡Sigue tirando!", turnChange: "Cambio de turno", foul: "Falta: bola en mano para el rival",
-      rerack: "La 8 cayÃ³ en el saque: nuevo triÃ¡ngulo", win8: "Bola 8 embocada", lose8foul: "Bola 8 con falta", lose8early: "Bola 8 antes de tiempo",
-      scratch: "blanca embocada", noContact: "no tocaste ninguna bola", wrongBall: "bola equivocada", noRail: "ninguna bola tocÃ³ banda", illegalBreak: "saque ilegal",
+      restart: "Reiniciar", menu: "Men\u00fa", again: "Revancha", wins: "\u00a1gana!", result: "Resultado", solids: "Lisas", stripes: "Rayadas", open: "Mesa abierta",
+      break: "Saque: apunta, ajusta la fuerza y pulsa TIRAR", again_: "\u00a1Sigue tirando!", turnChange: "Cambio de turno", foul: "Falta: bola en mano para el rival",
+      rerack: "La 8 cay\u00f3 en el saque: nuevo tri\u00e1ngulo", win8: "Bola 8 embocada", lose8foul: "Bola 8 con falta", lose8early: "Bola 8 antes de tiempo",
+      scratch: "blanca embocada", noContact: "no tocaste ninguna bola", wrongBall: "bola equivocada", noRail: "ninguna bola toc\u00f3 banda", illegalBreak: "saque ilegal",
       placeHint: "Arrastra la blanca y pulsa COLOCAR", games: "partidas" },
     en: { p1: "Player 1", p2: "Player 2", shoot: "SHOOT", place: "PLACE", power: "Power", pause: "Pause", resume: "Resume",
       restart: "Restart", menu: "Menu", again: "Rematch", wins: "wins!", result: "Result", solids: "Solids", stripes: "Stripes", open: "Open table",
@@ -109,7 +109,7 @@
     }
     let m = tx(st.message === "again" ? "again_" : st.message);
     if (st.lastFoul) m = tx("foul") + " (" + tx(st.lastFoul) + ")";
-    hud(m + (placing ? " Â· " + tx("placeHint") : ""));
+    hud(m + (placing ? " \u00b7 " + tx("placeHint") : ""));
   }
 
   function name(i) { return tx(i ? "p2" : "p1"); }
@@ -141,7 +141,7 @@
     [0, 1].forEach(i => {
       const gr = st.groups[i], rem = gr ? Rl.remaining(st, gr).length : null;
       const p = el.querySelector("#gp" + i);
-      p.innerHTML = "<b>" + name(i) + "</b><small>" + (gr ? tx(gr) + " Â· " + rem : tx("open")) + "</small>";
+      p.innerHTML = "<b>" + name(i) + "</b><small>" + (gr ? tx(gr) + " \u00b7 " + rem : tx("open")) + "</small>";
       p.classList.toggle("act", st.turn === i && !st.over);
     });
   }
