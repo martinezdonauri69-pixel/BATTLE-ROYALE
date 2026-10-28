@@ -9,6 +9,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/game.css">
 </head>
 <body>
 
@@ -58,25 +59,23 @@
   <button id="profile" class="panel btn enter" data-action="profile" aria-label="Perfil">
     <span class="avatar"><img src="assets/avatar.svg" alt="" draggable="false"></span>
     <span class="pinfo">
-      <span class="pname"><b id="pName">—</b><svg class="ic gold"><use href="#i-crown"/></svg></span>
-      <span class="prank" id="pRank">—</span>
-      <span class="xp"><i id="xpFill"></i><em id="xpText">— / —</em></span>
+      <span class="pname"><b id="pName">â€”</b><svg class="ic gold"><use href="#i-crown"/></svg></span>
+      <span class="prank" id="pRank">â€”</span>
+      <span class="xp"><i id="xpFill"></i><em id="xpText">â€” / â€”</em></span>
     </span>
-    <span class="lvl" id="pLevel">—</span>
+    <span class="lvl" id="pLevel">â€”</span>
   </button>
 
   <!-- ============ 2. Monedas / ajustes / mensajes (arriba derecha) ============ -->
   <div id="wallet" class="enter">
     <div class="res panel">
-      <svg class="ic green"><use href="#i-cash"/></svg><b id="coins">—</b>
+      <svg class="ic green"><use href="#i-cash"/></svg><b id="coins">â€”</b>
       <button class="plus btn" data-action="getCoins" data-i18n-title="getCoins" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
     </div>
     <div class="res panel">
-      <svg class="ic gold"><use href="#i-coin"/></svg><b id="gems">—</b>
+      <svg class="ic gold"><use href="#i-coin"/></svg><b id="gems">â€”</b>
       <button class="plus btn" data-action="getGems" data-i18n-title="getCoins" aria-label="+"><svg class="ic"><use href="#i-plus"/></svg></button>
     </div>
-    <button class="sq panel btn" data-action="settings" data-i18n-title="settings"><svg class="ic"><use href="#i-gear"/></svg></button>
-    <button class="sq panel btn" data-action="messages" data-i18n-title="messages"><svg class="ic"><use href="#i-mail"/></svg></button>
   </div>
 
   <!-- ============ 3. Logo ============ -->
@@ -92,7 +91,7 @@
   </button>
 
   <!-- ============ 4. Lateral izquierdo ============ -->
-  <nav id="sidebar" class="panel enter" aria-label="Menú">
+  <nav id="sidebar" class="panel enter" aria-label="MenÃº">
     <button class="side btn active" data-action="home"><svg class="ic"><use href="#i-home"/></svg><span data-i18n="home"></span></button>
     <button class="side btn" data-action="shop"><svg class="ic"><use href="#i-cart"/></svg><span data-i18n="shop"></span></button>
     <button class="side btn" data-action="profile"><svg class="ic"><use href="#i-user"/></svg><span data-i18n="profile"></span></button>
@@ -156,7 +155,6 @@
     <button class="rt btn" data-action="ranks"><svg class="ic gold"><use href="#i-crown"/></svg><span data-i18n="ranks"></span></button>
     <button class="rt btn" data-action="rewards"><svg class="ic gold"><use href="#i-gift"/></svg><span data-i18n="rewards"></span></button>
     <button class="rt btn" data-action="events"><svg class="ic gold"><use href="#i-calendar"/></svg><span data-i18n="events"></span></button>
-    <button class="rt btn" data-action="tournaments"><svg class="ic gold"><use href="#i-trophy"/></svg><span data-i18n="tournamentsShort"></span></button>
   </div>
 
   <button id="rShop" class="rbig panel btn enter" data-action="shop">
@@ -166,14 +164,14 @@
   </button>
 
   <button id="rPass" class="rbig panel btn enter" data-action="pass">
-    <span class="badge" id="passLvl">—</span>
-    <span class="txt"><b class="gold" data-i18n="seasonPass"></b><span class="bar"><i id="passFill"></i><em id="passText">— / —</em></span></span>
+    <span class="badge" id="passLvl">â€”</span>
+    <span class="txt"><b class="gold" data-i18n="seasonPass"></b><span class="bar"><i id="passFill"></i><em id="passText">â€” / â€”</em></span></span>
     <svg class="ic chev"><use href="#i-chev"/></svg>
   </button>
 
   <button id="rMission" class="rbig panel btn enter" data-action="missions">
     <svg class="ic big gold"><use href="#i-clipboard"/></svg>
-    <span class="txt"><b class="gold" data-i18n="dailyMissions"></b><small data-i18n="noMissions"></small><span class="bar"><i id="misFill"></i><em id="misText">— / —</em></span></span>
+    <span class="txt"><b class="gold" data-i18n="dailyMissions"></b><small data-i18n="noMissions"></small><span class="bar"><i id="misFill"></i><em id="misText">â€” / â€”</em></span></span>
     <svg class="ic chev"><use href="#i-chev"/></svg>
   </button>
 
@@ -188,7 +186,7 @@
     <small data-i18n="noOffers"></small>
   </button>
 
-  <!-- ============ 7. Accesos rápidos (parte inferior) ============ -->
+  <!-- ============ 7. Accesos rÃ¡pidos (parte inferior) ============ -->
   <div id="quick" class="panel enter">
     <button class="qk btn" data-action="cues"><svg class="ic big"><use href="#i-cue"/></svg><span data-i18n="cues"></span></button>
     <button class="qk btn" data-action="balls"><svg class="ic big"><use href="#i-ball"/></svg><span data-i18n="balls"></span></button>
@@ -200,7 +198,7 @@
 
   <button id="online" class="panel btn enter" data-action="online">
     <svg class="ic big blue"><use href="#i-globe"/></svg>
-    <span class="txt"><small data-i18n="onlinePlayers"></small><b id="onlineCount">—</b></span>
+    <span class="txt"><small data-i18n="onlinePlayers"></small><b id="onlineCount">â€”</b></span>
   </button>
 
   <!-- ============ 8. JUEGA AHORA ============ -->
@@ -237,18 +235,24 @@
 </div>
 </div>
 
-<!-- Aviso si el móvil está en vertical -->
-<div id="rotate"><div><svg class="ic" viewBox="0 0 24 24" width="64" height="64"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M20 8l2 3-3 1" /></svg><p id="rotateText">—</p></div></div>
+<!-- Aviso si el mÃ³vil estÃ¡ en vertical -->
+<div id="rotate"><div><svg class="ic" viewBox="0 0 24 24" width="64" height="64"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M20 8l2 3-3 1" /></svg><p id="rotateText">â€”</p></div></div>
 
 <noscript><p style="color:#fff;padding:20px">DMR POOL EMPIRE necesita JavaScript.</p></noscript>
 
-<!-- Orden de carga importante (scripts clásicos: funciona también abriendo index.html sin servidor) -->
+<!-- Orden de carga importante (scripts clÃ¡sicos: funciona tambiÃ©n abriendo index.html sin servidor) -->
 <script src="js/config.js"></script>
 <script src="js/store.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/services.js"></script>
 <script src="js/catalog.js"></script>
+<script src="js/engine/physics.js"></script>
+<script src="js/engine/rules.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/more.js"></script>
+<script src="js/game.js"></script>
 <script src="js/main.js"></script>
 </body>
+</html>
+
 </html>
