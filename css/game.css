@@ -12,3 +12,32 @@
 .gov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,4,10,.8)}
 .gov.on{display:flex}.gcard{display:flex;flex-direction:column;gap:12px;min-width:260px;padding:24px;border-radius:18px;border:2px solid #f5c04a;background:#080d1c;text-align:center}
 .gcard h2{color:#ffe9a6;font-size:28px}.gcard p{color:#8fd4ff}
+
+
+
+
+
+#game{position:fixed;inset:0;z-index:100;display:none;background:radial-gradient(ellipse at 50% 45%,#0a1838,#02040a 75%);touch-action:none;user-select:none;color:#eaf2ff;font-family:system-ui,sans-serif}
+#game.on{display:block}#gc{position:absolute;inset:0;touch-action:none}
+.gx{position:absolute;border:2px solid #2b6cff;border-radius:12px;background:linear-gradient(180deg,#121c33,#080d1a);box-shadow:0 0 12px rgba(43,108,255,.45)}
+#gMenu{left:8px;top:8px;width:50px;height:50px;font-size:26px;color:#eaf2ff;cursor:pointer}
+.gp{top:8px;height:50px;display:flex;align-items:center;gap:6px;padding:0 8px;overflow:hidden;font-size:13px}
+.gp img{width:36px;height:36px;border-radius:8px;border:2px solid #2b6cff}.gp.r img{border-color:#e83a3a}
+.gp.act{border-color:#ffd25a;box-shadow:0 0 16px rgba(255,210,90,.7)}
+.gp b{display:block;font-size:13px}.gp small{color:#8fd4ff;font-size:11px}
+.bl{display:flex;gap:3px;margin-top:2px}.bl i{width:16px;height:16px;border-radius:50%;font:700 9px/16px sans-serif;text-align:center;color:#fff;border:1px solid #fff8}.bl i.out{opacity:.25}
+#gTurn{top:8px;height:50px;left:50%;transform:translateX(-50%);min-width:150px;text-align:center;padding:4px 10px;font-weight:800;font-size:14px;color:#ffe9a6;border-color:#e83a3a}
+#gTurn small{display:block;color:#8fd4ff;font-weight:600;font-size:11px;max-width:230px}
+#gSpin{right:8px;top:8px;width:50px;height:50px;border-radius:50%;touch-action:none}
+#gSpin i{position:absolute;width:12px;height:12px;border-radius:50%;background:#e83a3a;box-shadow:0 0 8px #f33;left:19px;top:19px;pointer-events:none}
+#gPow{left:8px;top:74px;bottom:76px;width:46px;touch-action:none;background:linear-gradient(180deg,#2ecc40,#e6d92e 50%,#e83a3a)}
+#gPow b{position:absolute;left:-6px;right:-6px;height:16px;margin-top:-8px;border-radius:6px;background:linear-gradient(#fff,#9fb4d8);border:2px solid #2b6cff}
+#gPow span{position:absolute;left:0;right:0;text-align:center;font-size:10px;font-weight:800;color:#000a}
+#gBot{left:8px;bottom:8px;display:flex;height:56px;overflow:hidden}
+#gBot button{width:64px;background:none;border:0;border-right:1px solid #2b6cff55;color:#eaf2ff;font-size:10px;cursor:pointer}
+#gBot button:last-child{border:0}#gBot button.on{background:#2b6cff55;color:#ffe9a6}#gBot em{display:block;font-style:normal;font-size:22px;line-height:26px}
+#gPlace{left:50%;bottom:10px;transform:translateX(-50%);display:none;padding:12px 24px;font-weight:800;color:#1a1206;background:linear-gradient(#ffe9a6,#f5c04a);cursor:pointer}
+.gov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,4,10,.8)}.gov.on{display:flex}
+.gcard{display:flex;flex-direction:column;gap:10px;width:min(320px,88vw);max-height:90vh;overflow:auto;padding:20px;border-radius:16px;border:2px solid #2b6cff;background:#080d1c;text-align:center}
+.gcard h2{color:#ffe9a6}.gcard p{color:#9fc9ff;font-size:14px;text-align:left}
+.gb{min-height:46px;padding:0 16px;border-radius:12px;border:2px solid #2b6cff;background:linear-gradient(#16233f,#0a1224);color:#eaf2ff;font-weight:800;font-size:15px;cursor:pointer}.gb.gold{background:linear-gradient(#ffe9a6,#f5c04a);color:#1a1206;border-color:#ffe9a6}
