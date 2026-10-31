@@ -38,9 +38,16 @@
     const vv = window.visualViewport;
     const w = vv ? vv.width : window.innerWidth;
     const hgt = vv ? vv.height : window.innerHeight;
-    scale = Math.min(w / DMR.config.stage.w, hgt / DMR.config.stage.h);
-    const x = (w - DMR.config.stage.w * scale) / 2;
-    const y = (hgt - DMR.config.stage.h * scale) / 2;
+    const SW = DMR.config.stage.w, SH = DMR.config.stage.h;
+    scale = Math.min(w / SW, hgt / SH);
+    const extra = Math.max(0, w / scale - SW);                 // ancho sobrante: se reparte para llenar la pantalla
+    $("#stage").style.width = (SW + extra) + "px";
+    const bg = $("#bg"); if (bg) { bg.style.width = "100%"; bg.style.height = "100%"; bg.style.objectFit = "cover"; }
+    const vg = $("#vignette"); if (vg) { vg.style.width = "100%"; }
+    const GRP = { 0: ["profile", "sidebar", "eventBanner", "winners"], 0.5: ["logoWrap", "cardPlay", "cardTour", "cardFriend", "quick", "table"], 1: ["wallet", "rtop", "rShop", "rPass", "rMission", "rOffer", "online", "playNow", "langBox", "tagline"] };
+    Object.keys(GRP).forEach(k => GRP[k].forEach(id => { const n = document.getElementById(id); if (n) n.style.translate = (extra * k) + "px 0"; }));
+    const x = (w - (SW + extra) * scale) / 2;
+    const y = (hgt - SH * scale) / 2;
     $("#stage").style.transform = "translate(" + x + "px," + y + "px) scale(" + scale + ")";
     document.body.classList.toggle("portrait", hgt > w);
   }
@@ -231,7 +238,7 @@
     profile()      { openProfile(); },
     settings()     { openSettings(); },
     more()         { DMR.more.open(); },
-   play()         { closeModal(); try { DMR.game.open(); } catch (e) { alert("JUGAR fallo: " + e.message + " | game:" + !!DMR.game + " physics:" + !!DMR.physics + " rules:" + !!DMR.rules); } },
+    play()         { closeModal(); DMR.game.open(); },
     friendly()     { startAction("friendly", "rooms", "createPrivate", "dmr:private-room"); },
     tournaments()  { openSection("tournaments"); },
     friends()      { openSection("friends"); },
