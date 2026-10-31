@@ -127,6 +127,47 @@
     DMR.services.wallet.getBalance = async () => ({ ok: true, data: { coins: cst().coins, gems: cst().gems } });
   })();
 
+  /* ====== Progreso local (econom\u00eda de prueba): nivel, recompensa diaria y misiones ====== */
+  (function () {
+    if (!DMR.services || !DMR.ui) return;
+    const today = () => { const d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); };
+    const MIS = [{ id: "m1", t: "Juega 1 partida", n: 1, k: "games", r: 150 }, { id: "m2", t: "Emboca 5 bolas", n: 5, k: "pots", r: 200 }, { id: "m3", t: "Juega 3 partidas", n: 3, k: "games", r: 400 }];
+    const get = () => { const p = Object.assign({ xp: 0, games: 0, daily: "", md: "", mp: { games: 0, pots: 0 }, mc: [] }, DMR.store.get("prog", {})); if (p.md !== today()) { p.md = today(); p.mp = { games: 0, pots: 0 }; p.mc = []; } return p; };
+    const save = p => DMR.store.set("prog", p);
+    const pay = n => { const s2 = cst(); s2.coins += n; csave(s2); };
+    const api = {
+      level: () => { const p = get(); return { level: Math.floor(p.xp / 200) + 1, xp: p.xp % 200, xpNext: 200 }; },
+      addGame() { const p = get(); p.xp += 40; p.games++; p.mp.games++; save(p); },
+      addPots(n) { if (!n) return; const p = get(); p.mp.pots += n; save(p); },
+      dailyReady: () => get().daily !== today(),
+      claimDaily() { const p = get(); if (p.daily === today()) return false; p.daily = today(); save(p); pay(500); return true; },
+      missions: () => { const p = get(); return MIS.map(m => ({ id: m.id, t: m.t, n: m.n, r: m.r, p: Math.min(m.n, p.mp[m.k]), done: p.mp[m.k] >= m.n, claimed: p.mc.includes(m.id) })); },
+      claimMission(id) { const p = get(), m = MIS.find(x => x.id === id); if (!m || p.mc.includes(id) || p.mp[m.k] < m.n) return false; p.mc.push(id); save(p); pay(m.r); return true; }
+    };
+    DMR.local = api;
+    DMR.services.profile.getStats = async () => ({ ok: true, data: api.level() });
+    DMR.services.rewards.list = async () => ({ ok: true, data: {} });
+    DMR.services.missions.list = async () => ({ ok: true, data: {} });
+    const E = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c; if (x != null) n.textContent = x; return n; };
+    DMR.ui.renderers.rewards = () => {
+      const d = E("div", "empty"), ok = api.dailyReady(), b = E("button", "primary btn", ok ? "Reclamar 500 monedas" : "Ya reclamada hoy");
+      d.append(E("p", "soon", "Recompensa diaria"), E("p", "sub", "500 monedas de prueba, una vez al d\u00eda."), b); b.disabled = !ok;
+      b.addEventListener("click", () => { if (api.claimDaily()) { DMR.ui.refresh(); DMR.ui.toast("+500"); DMR.ui.openSection("rewards"); } });
+      return d;
+    };
+    DMR.ui.renderers.missions = () => {
+      const d = E("div"); d.append(E("p", "about", "Misiones diarias (recompensas de prueba, se renuevan cada d\u00eda)."));
+      api.missions().forEach(m => {
+        const r = E("div"); r.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px;margin:6px 0;border:1px solid #2b6cff88;border-radius:12px;background:#0c1630";
+        const t = E("div", null, m.t + "  " + m.p + "/" + m.n); t.style.flex = "1";
+        const b = E("button", "primary btn", m.claimed ? "Reclamada" : "Reclamar " + m.r); b.disabled = m.claimed || !m.done;
+        b.addEventListener("click", () => { if (api.claimMission(m.id)) { DMR.ui.refresh(); DMR.ui.toast("+" + m.r); DMR.ui.openSection("missions"); } });
+        r.append(t, b); d.append(r);
+      });
+      return d;
+    };
+  })();
+
   function drawCue(c2, w, h, k, rot) {
     const gr = c2.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, k.c[0]); gr.addColorStop(1, k.c[1]);
     c2.shadowColor = k.glow; c2.shadowBlur = 12; c2.fillStyle = gr; c2.fillRect(0, 0, w, h); c2.shadowBlur = 0;
@@ -219,6 +260,7 @@
 
   function endShot() {
     balls = shot.balls; const ev = shot.ev; shot = null;
+    if (DMR.local) DMR.local.addPots(ev.pocketed.filter(i => i !== 0).length);
     const pt = st.turn; st = Rl.applyShot(st, ev);
     if (st.turn !== pt) aim = st.turn === 0 ? 0 : Math.PI;      // J1 tira desde la izquierda, J2 desde la derecha
     if (st.rerack) { ori = {}; balls = P.rack(); st = Rl.newGame({ firstTurn: st.turn }); msg = MSG.rerack; hud(); return; }
@@ -238,6 +280,7 @@
     const w = st.winner;
     const s = DMR.store.get("stats", { games: 0, p1wins: 0 }); s.games++; if (w === 0) s.p1wins++; DMR.store.set("stats", s);
     const h = DMR.store.get("history", []); h.unshift({ at: Date.now(), winner: w, how: st.message }); DMR.store.set("history", h.slice(0, 20));
+    if (DMR.local) DMR.local.addGame();
     beep(520, 0.4, 0.2); hud();
     showBox(NAMES[w] + " gana", [MSG[st.message] || "", ["Revancha", start, true], ["Men\u00fa principal", close]]);
   }
@@ -582,6 +625,6 @@
     el.classList.add("on"); running = true; layout(); start(); if (!r3) start3D();
     last = performance.now(); requestAnimationFrame(frame);
   }
-  function close() { running = false; shot = null; strike = null; if (el) { hideBox(); el.classList.remove("on"); } }
+  function close() { running = false; shot = null; strike = null; if (el) { hideBox(); el.classList.remove("on"); } if (DMR.ui && DMR.ui.refresh) DMR.ui.refresh(); }
   DMR.game = { open, close, isOpen: () => running };
 })();
